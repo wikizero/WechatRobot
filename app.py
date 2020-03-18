@@ -37,8 +37,46 @@ def talk(msg):
 
     res = requests.post(url, data=dct, headers=header)
     if res.status_code == 200:
-        return res.json()['responses'][0]
-    return "Sorry, I have no idea what you're talking about!"
+        response = res.json()['responses']
+        return response[0] if response else "Sorry, I don't understand that."
+    return "There is something wrong with the server. Please try again later."
+
+
+def translate(text):
+    """
+    有道自动翻译： fanyi.youdao.com
+    :param text:
+    :return:
+    """
+    text_url = 'http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i={}'
+    data = requests.get(text_url.format(text)).json()
+    return '\n'.join([row[0]['tgt'] for row in data['translateResult']])
+
+
+def handle_msg(msg):
+    """
+    处理微信消息
+    :param msg:
+    :return:
+    """
+    print(msg, dir(msg))
+    if not msg:
+        return ''
+    msg_type = msg.type
+    if msg_type == 'voice':
+        # Recognition 是中文信息，需要翻译
+        recognition = msg.recognition
+        trans = translate(recognition)
+        reply = f'Q: {trans}({recognition})\nA: {talk(trans)}'
+        return reply
+    elif msg_type == 'text':
+        return talk(msg.content)
+    elif msg_type == 'image':
+        return "Sorry, I can't recognize the picture yet!"  # talk(msg.image)
+    elif msg_type == 'link':
+        return talk(msg.url)
+    elif msg_type == 'location':
+        return talk(f"My location is in {translate(msg.label)}")
 
 
 @app.route('/token', methods=['get', 'POST'])
@@ -52,6 +90,7 @@ def token():
 
         try:
             print('正在验证服务器签名')
+            # 无法验证成功？？？
             # check_signature(token, signature, timestamp, nonce)
             print('验证签名成功')
         except InvalidSignatureException as e:
@@ -60,15 +99,14 @@ def token():
 
         return echo_str
 
+    # POST
     print('开始处理用户消息')
     msg = parse_message(request.data)
-    print(msg, msg.content)
-    reply = talk(msg.content)
-    xml = TextReply(context='xxxx', message=msg).render()
-    xml = xml.replace('<Content><![CDATA[]]></Content>', f'<Content><![CDATA[{reply}]]></Content>')
-    # print(type(xml))
-    # print(xml)
-    return xml
+    reply_text = handle_msg(msg)
+    reply = TextReply(message=msg)
+    print(reply_text)
+    reply.content = reply_text
+    return reply.render()
 
 
 if __name__ == '__main__':
