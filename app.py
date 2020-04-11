@@ -15,6 +15,8 @@ from wechatpy.replies import TextReply
 from wechatpy.replies import ImageReply
 from wechatpy.exceptions import InvalidSignatureException
 
+from translate import translate
+
 token = '123token'
 secret_key = os.urandom(24)  # 生成密钥，为session服务。
 print(f'secret_key: {secret_key}')
@@ -42,15 +44,15 @@ def talk(msg):
     return "There is something wrong with the server. Please try again later."
 
 
-def translate(text):
-    """
-    有道自动翻译： fanyi.youdao.com
-    :param text:
-    :return:
-    """
-    text_url = 'http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i={}'
-    data = requests.get(text_url.format(text)).json()
-    return '\n'.join([row[0]['tgt'] for row in data['translateResult']])
+# def translate(text):
+#     """
+#     有道自动翻译： fanyi.youdao.com
+#     :param text:
+#     :return:
+#     """
+#     text_url = 'http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i={}'
+#     data = requests.get(text_url.format(text)).json()
+#     return '\n'.join([row[0]['tgt'] for row in data['translateResult']])
 
 
 def handle_msg(msg):
@@ -66,17 +68,15 @@ def handle_msg(msg):
     if msg_type == 'voice':
         # Recognition 是中文信息，需要翻译
         recognition = msg.recognition
-        trans = translate(recognition)
-        reply = f'Q: {trans}({recognition})\nA: {talk(trans)}'
-        return reply
+        return translate(recognition)
     elif msg_type == 'text':
-        return talk(msg.content)
+        return translate(msg.content)
     elif msg_type == 'image':
         return "Sorry, I can't recognize the picture yet!"  # talk(msg.image)
     elif msg_type == 'link':
-        return talk(msg.url)
+        return translate(msg.url)
     elif msg_type == 'location':
-        return talk(f"My location is in {translate(msg.label)}")
+        return translate(msg.label)
 
 
 @app.route('/token', methods=['get', 'POST'])
@@ -110,4 +110,7 @@ def token():
 
 
 if __name__ == '__main__':
+    # TODO 分配robot 或找其他robot代替
+    # TODO 寻找推送资源 （简单的英文信息，推送模板 怎么定义的？）
+    # TODO 单独给某个用户推送资源。做英语能力测试，然后收集英语文章信息做等级分类
     app.run(host='0.0.0.0', port=8081, debug=True)
