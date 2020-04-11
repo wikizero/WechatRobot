@@ -15,6 +15,7 @@ from wechatpy.replies import TextReply
 from wechatpy.replies import ImageReply
 from wechatpy.exceptions import InvalidSignatureException
 
+import mongo
 from translate import translate
 
 token = '123token'
@@ -70,7 +71,13 @@ def handle_msg(msg):
         recognition = msg.recognition
         return translate(recognition)
     elif msg_type == 'text':
-        return translate(msg.content)
+        text = msg.content
+        if text.startswith('ted'):
+            suffix = text.replace('ted', '').strip()
+            if suffix:
+                return mongo.query(suffix) or 'Sorry?'
+            return mongo.query('a') or 'Sorry?'
+        return translate(text)
     elif msg_type == 'image':
         return "Sorry, I can't recognize the picture yet!"  # talk(msg.image)
     elif msg_type == 'link':
@@ -113,4 +120,5 @@ if __name__ == '__main__':
     # TODO 分配robot 或找其他robot代替
     # TODO 寻找推送资源 （简单的英文信息，推送模板 怎么定义的？）
     # TODO 单独给某个用户推送资源。做英语能力测试，然后收集英语文章信息做等级分类
+
     app.run(host='0.0.0.0', port=8081, debug=True)

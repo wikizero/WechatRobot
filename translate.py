@@ -11,8 +11,8 @@ def translate(text):
     data = requests.get(url.format(text)).json()
     ret = f"{data.get('translation')[0]}\n"
     if 'basic' in data:
-        print(data)
-        ret += f"{data['basic'].get('phonetic')}\n"
+        if 'phonetic' in data['basic']:
+            ret += f"{data['basic'].get('phonetic')}\n"
         ret += '\n'.join(data['basic'].get('explains')) + '\n'
 
     if 'web' in data:
@@ -23,4 +23,4 @@ def translate(text):
 
 
 if __name__ == '__main__':
-    print(translate('love you'))
+    print(translate('呵呵哒'))
