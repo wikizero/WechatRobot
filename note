@@ -1,8 +1,9 @@
 autossh
 autossh -M 7878 -CNR 8080:0.0.0.0:8081 root@wx.heibaiblog.cn -p 2019
+autossh -M 7878 -gnfNTR 8080:0.0.0.0:8081 root@wx.heibaiblog.cn -p 2019
 
 7878为随便使用一个端口，用来与代理服务器交互，8080为代理服务器上的端口，8081为被代理服务器上的端口，wx.heibaiblog.cn为代理服务器IP地址。
-浏览器访问 http://wx.heibaiblog.cn:8081 即可代理到内网 127.0.0.1:8080 端口上
+浏览器访问 http://wx.heibaiblog.cn:8080 即可代理到内网 127.0.0.1:8081 端口上
 
 
 # image
@@ -31,3 +32,4 @@ ImageMessage(OrderedDict([('ToUserName', 'gh_ae0bf465c509'), ('FromUserName', 'o
 LinkMessage(OrderedDict([('ToUserName', 'gh_ae0bf465c509'), ('FromUserName', 'oEQso5yjJFTK1c13FLQBceJyLoho'),
 ('CreateTime', '1584538356'), ('MsgType', 'link'), ('Title', '算法分析神器—时间复杂度'),
 ('Description', '掌握时间复杂度，是学习算法的第一步'), ('Url', 'http://mp.weixin.qq.com/s?__biz=MzU1MDE4MzUxNA==&mid=2247483867&idx=1&sn=6270b56b79cb74334eb4faf80de05f0a&chksm=fba536eeccd2bff8e38566b3c12b439666fca9ec7ffa2a6c0d2271550702a3dc0851bd99d0cf&mpshare=1&scene=24&srcid=0209VMMHMzNVP9oRMjtuJPO0&sharer_sharetime=1581178506555&sharer_shareid=e87002816ad2f3298fa96c8281c88ad4#rd'), ('MsgId', '22685133664869482')]))
+

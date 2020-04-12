@@ -111,7 +111,6 @@ def token():
     msg = parse_message(request.data)
     reply_text = handle_msg(msg)
     reply = TextReply(message=msg)
-    print(reply_text)
     reply.content = reply_text
     return reply.render()
 
